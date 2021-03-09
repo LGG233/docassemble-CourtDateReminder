@@ -1,0 +1,53 @@
+mandatory: True
+code: |
+  allow_cron = True
+  multi_user = True
+---
+initial: True
+code: |
+  process_action()
+---
+question: |
+  What is your name?
+fields:
+  - Full Name: user_name
+    datatype: text
+---
+question: |
+  What is your e-mail address?
+fields:
+  - E-mail: email_address
+    datatype: email
+---
+question: |
+  When is your court date?
+fields:
+  - Court Date: court_date
+    datatype: date
+  - Time of Appearance: court_time
+    datatype: time
+---
+question: |
+  How many days in advance would you like to be reminded?
+fields:
+  - : reminder_advance
+    datatype: integer
+---
+mandatory: True
+question: |
+  Ok, I'll e-mail you, ${ user_name}, at ${ email_address}, ${ reminder_advance } day(s) before ${ format_date(court_date) }. 
+buttons:
+  Leave: leave
+---
+template: reminder_email
+subject: |
+  Court Date Coming Up on ${ format_date(court_date) }.
+content: |
+  This is your reminder that your court date is coming up tomorrow at format_datetime(court_time, 'h:mm')!
+---
+event: cron_daily
+code: |
+  if task_not_yet_performed('court date reminder') and date_difference(starting=court_date).days < reminder_advance:
+    send_email(to=email_address, template=reminder_email, task='court date reminder')
+  response()
+---
