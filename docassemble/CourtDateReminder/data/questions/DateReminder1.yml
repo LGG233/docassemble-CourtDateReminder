@@ -60,7 +60,7 @@ code: |
 ---
 mandatory: True
 code: |
-  al_intro_screen  # Organization intro screen/splash screen
+  # al_intro_screen  # Organization intro screen/splash screen
   # Introduction to this specific interview
   court_date_reminder_intro
   user_name
@@ -118,7 +118,7 @@ fields:
     show if: 
       variable: reminder_preference
       is: Email
-    required: False
+    required: True
 validation code: |
   if not (reminder_preference):
     validation_error ("You must select at least one method of contact")
