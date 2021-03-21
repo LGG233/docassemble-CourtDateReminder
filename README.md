@@ -1,8 +1,8 @@
 # docassemble.CourtDateReminder
 
-Court Date Reminder
+A docassemble extension.
 
 ## Author
 
-lance@thegodardgroup.com
+Lance Godard, lance@thegodardgroup.com
 

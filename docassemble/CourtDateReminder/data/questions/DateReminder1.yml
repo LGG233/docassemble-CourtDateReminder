@@ -1,24 +1,129 @@
+include:
+  - docassemble.AssemblyLine:al_package.yml
+  - docassemble.MassAccess:massaccess.yml
+---
+comment: |
+  The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
+metadata:
+  title: |
+    Court Date Reminder
+  short title: |
+    Court Date Reminder
+  tags:
+    - ES-00-00-00-00
+    - FA-00-00-00-00
+    - FA-07-00-00-00
+    - HE-00-00-00-00
+    - HO-00-00-00-00
+    - IM-00-00-00-00
+    - RI-10-00-00-00
+---
+comment: |
+  This section is used by AssemblyLine to control how some of the questions work.
 mandatory: True
+code: |
+  interview_metadata # make sure we initialize the object
+  if not defined("interview_metadata['DateReminder1']"):
+    interview_metadata.initializeObject('DateReminder1')
+  interview_metadata['DateReminder1'].update({
+    'title': 'Court Date Reminder',
+    'short title': 'Court Date Reminder',
+    'description': 'Get a reminder via email [or SMS text message] of your upcoming court date.',
+    'original_form': '',
+    'allowed courts': [
+    ],
+    'categories': [
+      'ES-00-00-00-00',
+      'FA-00-00-00-00',
+      'FA-07-00-00-00',
+      'HE-00-00-00-00',
+      'HO-00-00-00-00',
+      'IM-00-00-00-00',
+      'RI-10-00-00-00',
+    ],
+    'logic block variable': 'DateReminder1',
+    'typical role': 'unknown',
+  })
+---
+code: |
+  interview_short_title = 'Get a Reminder of Your Court Date'
+---
+code: |
+  al_form_type = 'other'
+---
+features:
+  navigation: True
+  mandatory: True
 code: |
   allow_cron = True
   multi_user = True
+---
+mandatory: True
+code: |
+  al_intro_screen  # Organization intro screen/splash screen
+  # Introduction to this specific interview
+  court_date_reminder_intro
+  user_name
+  reminder_preference
+  court_date
+  reminder_advance
 ---
 initial: True
 code: |
   process_action()
 ---
+id: Court Date Reminder
+continue button field: court_date_reminder_intro
+question: |
+  Court Date Reminder
+subquestion: |
+  Get a reminder via email or SMS text message of your upcoming court date.
+---
+id: User Name
 question: |
   What is your name?
 fields:
   - Full Name: user_name
     datatype: text
 ---
+id: Contact Preference
 question: |
-  What is your e-mail address?
+  How do you prefer to be contacted?
+subquestion: |
+  Please enter at least one way we can remind you.
 fields:
-  - E-mail: email_address
+  - Contact me via: reminder_preference
+    input type: radio
+    choices:
+      # -  Text Message
+      -  Email
+  - 'I consent to receiving text messages': consent_text_messages
+    datatype: yesno
+    show if: 
+      variable: reminder_preference
+      is: Text Message
+  - 'I consent to receiving emails': consent_emails
+    datatype: yesno
+    show if: 
+      variable: reminder_preference
+      is: Email
+  - 'Your mobile phone number': mobile_number
+    maxlength: 12
+    show if: 
+      variable: reminder_preference
+      is: Text Message
+    required: False
+  - 'Your email address': email_address
     datatype: email
+    show if: 
+      variable: reminder_preference
+      is: Email
+    required: False
+validation code: |
+  if not (reminder_preference):
+    validation_error ("You must select at least one method of contact")
 ---
+id: Court Date
 question: |
   When is your court date?
 fields:
@@ -27,15 +132,26 @@ fields:
   - Time of Appearance: court_time
     datatype: time
 ---
+id: Reminder Interval
 question: |
-  How many days in advance would you like to be reminded?
+  When would you like to be reminded?
 fields:
-  - : reminder_advance
+  - Days before your court date: reminder_advance
     datatype: integer
 ---
+code: |
+  if reminder_advance == 1:
+    days_advance = "day"
+  else:
+    days_advance = "days"
+---
+id: Confirmation Screen
 mandatory: True
 question: |
-  Ok, I'll e-mail you, ${ user_name}, at ${ email_address}, ${ reminder_advance } day(s) before ${ format_date(court_date) }. 
+  Ok, I'll remind you ${ reminder_advance } ${ days_advance} before your ${ format_date(court_date) } court appearance. [BR]
+  [BR]
+  Name: ${ user_name}[BR]
+  Email: ${ email_address}
 buttons:
   Leave: leave
 ---
@@ -43,7 +159,7 @@ template: reminder_email
 subject: |
   Court Date Coming Up on ${ format_date(court_date) }.
 content: |
-  This is your reminder that your court date is coming up tomorrow at format_datetime(court_time, 'h:mm')!
+  This is your reminder that your court appearance is coming up on ${ format_date(court_date) } at ${ format_time(court_time) }!
 ---
 event: cron_daily
 code: |
