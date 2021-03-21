@@ -77,7 +77,7 @@ continue button field: court_date_reminder_intro
 question: |
   Court Date Reminder
 subquestion: |
-  Get a reminder via email or SMS text message of your upcoming court date.
+  Get a reminder via email [or SMS text message] of your upcoming court date.
 ---
 id: User Name
 question: |
