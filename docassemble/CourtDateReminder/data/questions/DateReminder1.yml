@@ -28,7 +28,7 @@ code: |
   interview_metadata['DateReminder1'].update({
     'title': 'Court Date Reminder',
     'short title': 'Court Date Reminder',
-    'description': 'Get a reminder via email [or SMS text message] of your upcoming court date.',
+    'description': 'Get a reminder via email of an upcoming court date.',
     'original_form': '',
     'allowed courts': [
     ],
@@ -77,7 +77,7 @@ continue button field: court_date_reminder_intro
 question: |
   Court Date Reminder
 subquestion: |
-  Get a reminder via email [or SMS text message] of your upcoming court date.
+  This app allows you to get an email reminding you of an upcoming court date.
 ---
 id: User Name
 question: |
